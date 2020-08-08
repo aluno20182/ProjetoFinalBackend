@@ -17,7 +17,7 @@ mongoose
   .catch(err => console.log(err));
  */
 
-//Criar a coneção
+//Criar a conecção
 const db = mysql.createConnection({
   host : 'localhost',
   user : 'root',
@@ -34,12 +34,11 @@ db.connect(() => {
   console.log('MySQL connected')
 });
 
-const app = express();
 
 //Create Table
 app.get('/createuserstable', (req, res) => {
   let sql = 'CREATE TABLE users'
-  
+
 })
 
 app.use(bodyParser.json())
