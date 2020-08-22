@@ -10,6 +10,7 @@
   "author": "ricardo_vp",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^5.0.0",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
     "express": "^4.17.1",
@@ -18,6 +19,7 @@
     "mongodb": "^3.3.1",
     "mongoose": "^5.6.10",
     "mysql": "^2.18.1",
-    "nodemon": "^1.19.4"
+    "nodemon": "^1.19.4",
+    "uuid": "^8.3.0"
   }
 }
