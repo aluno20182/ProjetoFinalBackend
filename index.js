@@ -1,72 +1,67 @@
 //Load express module with `require` directive
-const express = require('express');
+const express = require("express");
 const app = express();
 const bcrypt = require("bcryptjs");
 const uuid = require("uuid");
-const config = require('./config.js');
+const config = require("./config.js");
 
-const jwt = require('jsonwebtoken')
+const jwt = require("jsonwebtoken");
 
-const mysql = require('mysql');
-const userRoute = require('./Routes/User');
+const mysql = require("mysql");
+const userRoute = require("./Routes/User");
 const bodyParser = require("body-parser");
 
-
-app.use(bodyParser.json())
-app.use('/', userRoute);
-
+app.use(bodyParser.json());
+app.use("/", userRoute);
 
 const port = 3000;
 
-
 //Criar a conecção
 const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: 'test123',
-  database: 'nodesql',
+  host: "127.0.0.1",
+  user: "root",
+  password: 'root',
+  database: "nodesql",
   multipleStatements: true,
-  port: '3306'
-
+  port: 3306,
 });
 
-
-//###########################################################################     DATABASE      ################################################################################## 
+//###########################################################################     DATABASE      ##################################################################################
 
 //Coneção DB
 db.connect((err) => {
   if (err) {
     console.log(err);
   }
-  console.log('MySQL connected')
+  console.log("MySQL connected");
 });
 
-
 //Create DB
-app.get('/createdb', (req, res) => {
-  let sql = 'CREATE DATABASE nodesql';
+app.get("/createdb", (req, res) => {
+  let sql = "CREATE DATABASE nodesql";
   db.query(sql, (err, result) => {
     if (err) {
       console.log(err);
     }
     console.log(result);
-    res.send('Database created...')
+    res.send("Database created...");
   });
 });
 
-//###########################################################################     TABLES      ################################################################################## 
+//###########################################################################     TABLES      ##################################################################################
 
 //Create Table Users
-app.get('/createuserstable', (req, res) => {
-  let sql = 'CREATE TABLE users (user_id INT AUTO_INCREMENT PRIMARY KEY, email VARCHAR(255) UNIQUE, password VARCHAR(255), username VARCHAR(255) NOT NULL UNIQUE, firstname VARCHAR(255), lastname VARCHAR(255), points INT NOT NULL)';
+app.get("/createuserstable", (req, res) => {
+  let sql =
+    "CREATE TABLE users (user_id INT AUTO_INCREMENT PRIMARY KEY, email VARCHAR(255) UNIQUE, password VARCHAR(255), username VARCHAR(255) NOT NULL UNIQUE, firstname VARCHAR(255), lastname VARCHAR(255), points INT NOT NULL, token VARCHAR(255))";
   db.query(sql, (err, result) => {
     if (err) {
       console.log(err);
-    };
+    }
     console.log(result);
-    res.send('Users table created...')
-  })
-})
+    res.send("Users table created...");
+  });
+});
 
 /* `user_id` int(11) NOT NULL,
 `email` varchar(255) NOT NULL,
@@ -77,46 +72,49 @@ app.get('/createuserstable', (req, res) => {
 `username` varchar(255) NOT NULL */
 
 //Create Table Tokens
-app.get('/createtokenstable', (req, res) => {
-  console.log('this... ', req)
-  let sql = 'CREATE TABLE tokens (id INT AUTO_INCREMENT PRIMARY KEY, user_id INT UNIQUE, token VARCHAR(255))';
+app.get("/createtokenstable", (req, res) => {
+  console.log("this... ", req);
+  let sql =
+    "CREATE TABLE tokens (id INT AUTO_INCREMENT PRIMARY KEY, user_id INT UNIQUE, token VARCHAR(255))";
   db.query(sql, (err, result) => {
     if (err) {
       console.log(err);
-    };
+    }
     console.log(result);
-    res.send('Tokens table created...')
-  })
-})
+    res.send("Tokens table created...");
+  });
+});
 
-
-
-//###########################################################################     AÇÕES      ################################################################################## 
+//###########################################################################     AÇÕES      ##################################################################################
 
 //Criar Conta
 
-
 /**
  * insert into users (id, firstname, lastname, email, password, budget) values (default, $1, $2, $3, $4, $5) returning id`,
-*/
+ */
 
 app.post("/createaccount", async (req, resp, next) => {
   let user = req.body;
-  console.log('user', user)
-  let password = req.body.password
+  console.log("user", user);
+  let password = req.body.password;
   const token = jwt.sign({ _id: user.username }, "chavesecreta");
-  let encryptedPassword = await bcrypt.hash(password, 10)
-  console.log('password', encryptedPassword)
+  let encryptedPassword = await bcrypt.hash(password, 10);
+  console.log("password", encryptedPassword);
   try {
-    db.query('insert into users (user_id, username, email, password, firstname, lastname, points, token) values (default, ?, ?, ?, ?, ?, 0, ? );', [
-      user.username,
-      user.email,
-      encryptedPassword,
-      user.firstname,
-      user.lastname,
-      token,
-    ])
-  } catch (error) {
+    db.query(
+      "insert into users (user_id, username, email, password, firstname, lastname, points, token) values (default, ?, ?, ?, ?, ?, 50, ? );",
+      [
+        user.username,
+        user.email,
+        encryptedPassword,
+        user.firstname,
+        user.lastname,
+        token,
+      ]
+    );
+    resp.json(token);
+    console.log("Query criada");
+  } catch (err) {
     if (
       err.message ===
       'duplicate key value violates unique constraint "users_email_key"'
@@ -129,7 +127,6 @@ app.post("/createaccount", async (req, resp, next) => {
     }
   }
 
-
   /*     .then((results) => {
         let token = uuid.v4();
         console.log('o que vem de cima', results)
@@ -141,91 +138,113 @@ app.post("/createaccount", async (req, resp, next) => {
   /** Eliminar a tabela tokens
    * Registo tokens no user
    * fazer com que o bcrypt.hash seja uma constante que está dentro do db.query
-   * 
+   *
    * Happy days
    * */
-
 
   /*})
    .then(([user_id, result]) => {
     resp.json({ token: result.token });
     return user_id;
   }) */
-
 });
 
 app.post("/loginaccount", async (req, res) => {
   console.log("Login");
   let user = req.body;
-  console.log(user)
+  console.log(user);
 
-  /*   db.query('select user_id, username, email, password as encryptedPassword, token from users where email = ?', [user.email], function ( results) {
+  /*   db.query('select user_id, username, email, password as encryptedPassword, token, firstname, lastname from users where email = ?', [user.email], function ( results) {
    */
   try {
-    db.query('select user_id, username, email, password as encryptedPassword, token from users where email = ?', [user.email], async function (err, results, fields) {
-      if (!user) {
-        return res.status(404).send('User Not Found.');
-      } else {
+    db.query(
+      "select user_id, username, email, password as encryptedPassword, token, firstname, lastname from users where email = ?",
+      [user.email],
+      async function (err, results, fields) {
+        if (!user) {
+          return results.status(404).send("User Not Found.");
+        } else {
+          if (err) throw err;
+          console.log("resultado ", results[0]);
 
-        if (err) throw err;
-        console.log('resultado ', results);
-        console.log('pass escrita invalid: ', results[0].encryptedPassword)
-
-        var passwordIsValid = await bcrypt.compare(user.password, results[0].encryptedPassword);
-        if (!passwordIsValid) {
-          console.log('pass do body invalid: ', user.password)
-
-        }
-        else {
-          console.log('pass do body: ', user.password)
-          console.log('pass escrita: ', results.encryptedPassword)
-          var token = jwt.sign({ id: user.user_id }, config.secret);
-          db.query('update users set token = ? where email=?', [token, user.email])
-
-          res.status(200).send({ auth: true, accessToken: token });
+          var passwordIsValid = await bcrypt.compare(
+            user.password,
+            results[0].encryptedPassword
+          );
+          if (!passwordIsValid) {
+            console.log("pass do body invalid: ", user.password);
+          } else {
+            //console.log("pass do body: ", user.password);
+            console.log("pass escrita: ", results[0].encryptedPassword);
+            const token = jwt.sign({ _id: user.username }, "chavesecreta");
+            db.query("update users set token = ? where email=?", [
+              token,
+              user.email,
+            ]);
+            let loginData = {
+              username: results[0].username,
+              email: results[0].email,
+              firstname: results[0].firstname,
+              lastname: results[0].lastname,
+              token: token,
+            };
+            console.log(loginData)
+            res.json(loginData);
+          }
         }
       }
-
-
-    })
-  }
-  catch(error){
-    console.log("handing error during login: ", error);
-      if (error.message === "No data returned from the query.") {
-        let errMessage = { message: "login failed" };
-        resp.status(401);
-        resp.json(errMessage);
-      } else if (error.message === "password is incorrect") {
-        let errMessage = { message: "login failed" };
-        resp.status(401);
-        resp.json(errMessage);
-      } else {
-        console.log("something bad happened");
-        throw error;
-      }
-  }
-
-
-
-
-})
-
-
-/* app.post("/logout", auth, async (req, res) => {
-  // Log user out of the application
-  try {
-    req.user.tokens = req.user.tokens.filter((token) => {
-      return token != req.token
-    })
-    await req.user.save()
-    res.send()
+    );
   } catch (error) {
-    res.status(500).send(error)
+    console.log("handing error during login: ", error);
+    if (error.message === "No data returned from the query.") {
+      let errMessage = { message: "login failed" };
+      resp.status(401);
+      resp.json(errMessage);
+    } else if (error.message === "password is incorrect") {
+      let errMessage = { message: "login failed" };
+      resp.status(401);
+      resp.json(errMessage);
+    } else {
+      console.log("something bad happened");
+      throw error;
+    }
   }
+});
+
+app.post("/logout", async (req, res) => {
+  // Log user out of the application
+  console.log("Logout");
+  let user = req.body;
+  console.log(user);
+  let email = req.body.email;
+  try {
+    db.query("update users set token = '' where email = ?", [email]);
+
+    console.log("Query efetuada");
+    res.json(token);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+});
+
+
+app.post("/getpoints", (req, res) =>{
+  console.log("PONTOS");
+  let user = req.body;
+  console.log(user);
+  let email = req.body.email;
+  try {
+    db.query("select points from users where email = ?", [email]);
+
+    console.log("Query efetuada");
+    res.json(token);
+  } catch (error) {
+    res.status(500).send(error);
+  }
+
 })
- */
 
 //Launch listening server on port 3000
 app.listen(port, function () {
-  console.log('app listening on port 3000!')
-})
+  console.log("app listening on port 3000!");
+});
