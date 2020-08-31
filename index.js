@@ -154,19 +154,18 @@ app.post("/loginaccount", async (req, res) => {
   let user = req.body;
   console.log(user);
 
-  /*   db.query('select user_id, username, email, password as encryptedPassword, token from users where email = ?', [user.email], function ( results) {
+  /*   db.query('select user_id, username, email, password as encryptedPassword, token, firstname, lastname from users where email = ?', [user.email], function ( results) {
    */
   try {
     db.query(
-      "select user_id, username, email, password as encryptedPassword, token from users where email = ?",
+      "select user_id, username, email, password as encryptedPassword, token, firstname, lastname from users where email = ?",
       [user.email],
       async function (err, results, fields) {
         if (!user) {
-          return res.status(404).send("User Not Found.");
+          return results.status(404).send("User Not Found.");
         } else {
           if (err) throw err;
-          console.log("resultado ", results);
-          console.log("pass escrita invalid: ", results[0].encryptedPassword);
+          console.log("resultado ", results[0]);
 
           var passwordIsValid = await bcrypt.compare(
             user.password,
@@ -175,15 +174,22 @@ app.post("/loginaccount", async (req, res) => {
           if (!passwordIsValid) {
             console.log("pass do body invalid: ", user.password);
           } else {
-            console.log("pass do body: ", user.password);
-            console.log("pass escrita: ", results.encryptedPassword);
+            //console.log("pass do body: ", user.password);
+            console.log("pass escrita: ", results[0].encryptedPassword);
             const token = jwt.sign({ _id: user.username }, "chavesecreta");
             db.query("update users set token = ? where email=?", [
               token,
               user.email,
             ]);
-
-            res.json(token);
+            let loginData = {
+              username: results[0].username,
+              email: results[0].email,
+              firstname: results[0].firstname,
+              lastname: results[0].lastname,
+              token: token,
+            };
+            console.log(loginData)
+            res.json(loginData);
           }
         }
       }
