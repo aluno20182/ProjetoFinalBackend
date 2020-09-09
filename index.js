@@ -18,9 +18,9 @@ const port = 3000;
 
 //Criar a conecção
 const db = mysql.createConnection({
-  host: "127.0.0.1",
+  host: "localhost",
   user: "root",
-  password: 'root',
+  password: "test123",
   database: "nodesql",
   multipleStatements: true,
   port: 3306,
@@ -158,7 +158,7 @@ app.post("/loginaccount", async (req, res) => {
    */
   try {
     db.query(
-      "select user_id, username, email, password as encryptedPassword, token, firstname, lastname from users where email = ?",
+      "select user_id, username, email, password as encryptedPassword, token, firstname, lastname, points from users where email = ?",
       [user.email],
       async function (err, results, fields) {
         if (!user) {
@@ -186,10 +186,11 @@ app.post("/loginaccount", async (req, res) => {
               email: results[0].email,
               firstname: results[0].firstname,
               lastname: results[0].lastname,
+              points: results[0].points,
               token: token,
             };
             console.log(loginData)
-            res.json(loginData);
+            return res.json(loginData);
           }
         }
       }
