@@ -113,6 +113,9 @@ app.post("/createaccount", async (req, resp, next) => {
       ]
     );
     resp.json(token);
+    db.query("update users set points=points+50 where email = ?", [
+      user.email,
+    ]);
     console.log("Query criada");
   } catch (err) {
     if (
@@ -181,6 +184,9 @@ app.post("/loginaccount", async (req, res) => {
               token,
               user.email,
             ]);
+            db.query("update users set points=points+10 where email = ?", [
+              user.email,
+            ]);
             let loginData = {
               username: results[0].username,
               email: results[0].email,
@@ -229,7 +235,39 @@ app.post("/logout", async (req, res) => {
 });
 
 
-app.post("/getpoints", (req, res) =>{
+//################################################  Pontos hotspot  ###############################//
+app.post("/pontoshotspot", (req, res) => {
+  console.log("PONTOS HOTSPOT");
+  let users = req.body;
+  console.log(users);
+  try {
+
+    db.query(
+      //'select user_id, points from user where username = ?'
+      //'update user set points = points + 10 WHERE username = ?'
+
+      "select user_id, points from user where username = ?",
+      [users.username]
+
+    );
+    let data = {
+      username: results[0].username,
+      points: results[0].points,
+    };
+    console.log(data)
+    return res.json(data);
+
+  } catch (error) {
+    res.status(500).send(error);
+  }
+
+})
+
+
+
+
+
+app.post("/getpoints", (req, res) => {
   console.log("PONTOS");
   let user = req.body;
   console.log(user);
