@@ -8,11 +8,9 @@ const config = require("./config.js");
 const jwt = require("jsonwebtoken");
 
 const mysql = require("mysql");
-const userRoute = require("./Routes/User");
 const bodyParser = require("body-parser");
 
 app.use(bodyParser.json());
-app.use("/", userRoute);
 
 const port = 3000;
 
@@ -24,6 +22,12 @@ const db = mysql.createConnection({
   database: "nodesql",
   multipleStatements: true,
   port: 3306,
+});
+
+
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  next();
 });
 
 //###########################################################################     DATABASE      ##################################################################################
@@ -93,7 +97,7 @@ app.get("/createtokenstable", (req, res) => {
  * insert into users (id, firstname, lastname, email, password, budget) values (default, $1, $2, $3, $4, $5) returning id`,
  */
 
-app.post("/createaccount", async (req, resp, next) => {
+app.post("/createaccount", async (req, res, next) => {
   let user = req.body;
   console.log("user", user);
   let password = req.body.password;
@@ -112,11 +116,13 @@ app.post("/createaccount", async (req, resp, next) => {
         token,
       ]
     );
-    resp.json(token);
     db.query("update users set points=points+50 where email = ?", [
       user.email,
-    ]);
-    console.log("Query criada");
+    ], async function (err, results, fields) {
+      console.log("resultado desta shit ", results);
+      return res.json(results)
+    });
+
   } catch (err) {
     if (
       err.message ===
@@ -184,7 +190,7 @@ app.post("/loginaccount", async (req, res) => {
               token,
               user.email,
             ]);
-            db.query("update users set points=points+10 where email = ?", [
+            db.query("update users set points=points+5 where email = ?", [
               user.email,
             ]);
             let loginData = {
@@ -240,50 +246,143 @@ app.post("/pontoshotspot", (req, res) => {
   console.log("PONTOS HOTSPOT");
   let users = req.body;
   console.log(users);
-  try {
 
+  try {
     db.query(
-      //'select user_id, points from user where username = ?'
-      //'update user set points = points + 10 WHERE username = ?'
+      "select user_id, username, email, password as encryptedPassword, token, firstname, lastname, points from users where email = ?",
+      [users.email],
+      async function (err, results, fields) {
+        if (!users) {
+          return results.status(404).send("User Not Found.");
+        } else {
+          if (err) throw err;
+          console.log("resultado ", results[0]);
 
-      "select user_id, points from user where username = ?",
-      [users.username]
 
+          db.query("update users set points=points+10 where email = ?", [
+            users.email,
+          ]);
+          let loginData = {
+            username: results[0].username,
+            email: results[0].email,
+            firstname: results[0].firstname,
+            lastname: results[0].lastname,
+            points: results[0].points,
+          };
+          console.log(loginData)
+          return res.json(loginData);
+
+        }
+      }
     );
-    let data = {
-      username: results[0].username,
-      points: results[0].points,
-    };
-    console.log(data)
-    return res.json(data);
-
   } catch (error) {
-    res.status(500).send(error);
+    console.log("handing error: ", error);
+    if (error.message === "No data returned from the query.") {
+      let errMessage = { message: "failed" };
+      resp.status(401);
+      resp.json(errMessage);
+    } else {
+      resp.json(errMessage);
+      console.log("something bad happened");
+      throw error;
+    }
   }
 
 })
 
+////////////////////////////////
+app.get("/showusers", (req, res) => {
+  console.log("USERS");
+  let users = req.body;
+  //console.log(users);
 
-
-
-
-app.post("/getpoints", (req, res) => {
-  console.log("PONTOS");
-  let user = req.body;
-  console.log(user);
-  let email = req.body.email;
   try {
-    db.query("select points from users where email = ?", [email]);
-
-    console.log("Query efetuada");
-    res.json(token);
+    db.query(
+      "select user_id, username, email, password as encryptedPassword, token, firstname, lastname, points from users", async function (err, results, fields) {
+        console.log("resultado ", results);
+        return res.json(results)
+      }
+    );
   } catch (error) {
-    res.status(500).send(error);
+    console.log("handing error: ", error);
+    if (error.message === "No data returned from the query.") {
+      let errMessage = { message: "failed" };
+      resp.status(401);
+      resp.json(errMessage);
+    } else {
+      resp.json(errMessage);
+      console.log("something bad happened");
+      throw error;
+    }
   }
 
 })
+
+
+////////////////////////////////
+app.post("/deleteuser", (req, res) => {
+  console.log("DELETE");
+  let users = req.body;
+  console.log('AQUIIII', users);
+
+
+  console.log('RESULTADO ', users.user_id);
+
+  try {
+    db.query(
+      "delete from users where user_id=?", [users.user_id], async function (err, results, fields) {
+        console.log("resultado desta shit ", results);
+        return res.json(results)
+      }
+    );
+  } catch (error) {
+    console.log("handing error: ", error);
+    if (error.message === "No data returned from the query.") {
+      let errMessage = { message: "failed" };
+      resp.status(401);
+      resp.json(errMessage);
+    } else {
+      resp.json(errMessage);
+      console.log("something bad happened");
+      throw error;
+    }
+  }
+
+})
+
+////////////////////////////////
+app.post("/updateuser", (req, res) => {
+  console.log("UPDATE");
+  let users = req.body;
+  console.log('AQUIIII', users);
+
+
+  try {
+    db.query(
+      "update users set username=?, email=?, firstname=?, lastname=?, points=? where user_id=?", [users.username, users.email, users.firstname, users.lastname, users.points, users.user_id], async function (err, results, fields) {
+        console.log("resultado desta shit ", results);
+        return res.json(results)
+      }
+    );
+  } catch (error) {
+    console.log("handing error: ", error);
+    if (error.message === "No data returned from the query.") {
+      let errMessage = { message: "failed" };
+      resp.status(401);
+      resp.json(errMessage);
+    } else {
+      resp.json(errMessage);
+      console.log("something bad happened");
+      throw error;
+    }
+  }
+
+})
+
+
+
 
 //Launch listening server on port 3000
 app.listen(port, function () {
-  console.log("app listening on port 3000!");
+  console.log("app listening on port:", port);
 });
