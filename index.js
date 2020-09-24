@@ -40,7 +40,7 @@ db.connect((err) => {
   console.log("MySQL connected");
 });
 
-//Create DB
+/* //Create DB
 app.get("/createdb", (req, res) => {
   let sql = "CREATE DATABASE nodesql";
   db.query(sql, (err, result) => {
@@ -51,10 +51,10 @@ app.get("/createdb", (req, res) => {
     res.send("Database created...");
   });
 });
-
+ */
 //###########################################################################     TABLES      ##################################################################################
 
-//Create Table Users
+/* //Create Table Users
 app.get("/createuserstable", (req, res) => {
   let sql =
     "CREATE TABLE users (user_id INT AUTO_INCREMENT PRIMARY KEY, email VARCHAR(255) UNIQUE, password VARCHAR(255), username VARCHAR(255) NOT NULL UNIQUE, firstname VARCHAR(255), lastname VARCHAR(255), points INT NOT NULL, token VARCHAR(255))";
@@ -65,7 +65,7 @@ app.get("/createuserstable", (req, res) => {
     console.log(result);
     res.send("Users table created...");
   });
-});
+}); */
 
 /* `user_id` int(11) NOT NULL,
 `email` varchar(255) NOT NULL,
@@ -385,4 +385,14 @@ app.post("/updateuser", (req, res) => {
 //Launch listening server on port 3000
 app.listen(process.env.PORT || 5000, function () {
   console.log("app listening on port:");
+
+  let sql =
+    "CREATE TABLE users (user_id INT AUTO_INCREMENT PRIMARY KEY, email VARCHAR(255) UNIQUE, password VARCHAR(255), username VARCHAR(255) NOT NULL UNIQUE, firstname VARCHAR(255), lastname VARCHAR(255), points INT NOT NULL, token VARCHAR(255))";
+  db.query(sql, (err, result) => {
+    if (err) {
+      console.log(err);
+    }
+    console.log(result);
+    res.send("Users table created...");
+  });
 });
