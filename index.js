@@ -16,10 +16,10 @@ const port = 3000;
 
 //Criar a conecção
 const db = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "test123",
-  database: "nodesql",
+  host: "remotemysql.com",
+  user: "a1cLwZC3Mx",
+  password: "DRJYTgPf8O",
+  database: "a1cLwZC3Mx",
   multipleStatements: true,
   port: 3306,
 });
