@@ -68,15 +68,11 @@ class App extends React.Component {
   }
 
   handleAddUser() {
-
-    console.log('pimba', this.state.aux)
-
+    //Criação de array para recber os dados do novo user
     let auxiliar = this.state.aux
-
     let data = JSON.stringify(auxiliar)
 
-
-
+    //Comunicação com o endpoint da API
     fetch(Url + '/createaccount', {
       method: 'POST',
       headers: {
@@ -85,12 +81,11 @@ class App extends React.Component {
       },
       body: data
     }).then(
+      //Remove a possibilidade de edição
       this.setState({ edit: false })
     )
-
+    //Faz refreah da pagina
     window.location.reload()
-      
-
   }
 
 
@@ -98,21 +93,9 @@ class App extends React.Component {
 
     this.setState({ edit: false })
 
-
-
-    //this.setState({person: aux})
     console.log('PERSON', person)
-    /*     console.log(this.state.person[index].user_id)
-        console.log(this.state.username)
-        console.log(this.state.person[index].email)
-        console.log(this.state.person[index].encryptedPassword)
-        console.log(this.state.person[index].token)
-        console.log(this.state.person[index].firstname)
-        console.log(this.state.person[index].lastname)
-        console.log(this.state.person[index].points) */
 
     let data = JSON.stringify(person)
-
 
     await fetch(Url + '/updateuser', {
       method: 'POST',
@@ -122,8 +105,6 @@ class App extends React.Component {
       },
       body: data
     });
-
-    //this.componentDidMount()
 
   }
 
@@ -161,16 +142,6 @@ class App extends React.Component {
   renderTableDataEdit() {
     return this.state.person.map((person, index) => {
       const { user_id, username, email, encryptedPassword, token, firstname, lastname, points } = person //destructuring
-      /*       this.state({
-              user_id: user_id,
-              username: username,
-              email: email,
-              encryptedPassword: encryptedPassword,
-              token: token,
-              firstname: firstname,
-              lastname: lastname,
-              points: points,
-            }) */
       return (
         <tr key={user_id}>
           <td>{user_id}</td>
