@@ -393,6 +393,6 @@ app.listen(process.env.PORT || 5000, function () {
       console.log(err);
     }
     console.log(result);
-    res.send("Users table created...");
+    console.log("Users table created...");
   });
 });
