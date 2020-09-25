@@ -387,7 +387,7 @@ app.listen(process.env.PORT || 5000, function () {
   console.log("app listening on port:");
 
   let sql =
-    "CREATE TABLE users (user_id INT AUTO_INCREMENT PRIMARY KEY, email VARCHAR(255) UNIQUE, password VARCHAR(255), username VARCHAR(255) NOT NULL UNIQUE, firstname VARCHAR(255), lastname VARCHAR(255), points INT NOT NULL, token VARCHAR(255))";
+    "CREATE TABLE IF NOT EXISTS users (user_id INT AUTO_INCREMENT PRIMARY KEY, email VARCHAR(255) UNIQUE, password VARCHAR(255), username VARCHAR(255) NOT NULL UNIQUE, firstname VARCHAR(255), lastname VARCHAR(255), points INT NOT NULL, token VARCHAR(255))";
   db.query(sql, (err, result) => {
     if (err) {
       console.log(err);
