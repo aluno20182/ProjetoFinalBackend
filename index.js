@@ -24,10 +24,13 @@ const db = mysql.createConnection({
   port: 3306,
 });
 
-db.query('select 1 + 1', (err, rows) => { /* */ });
+
+setInterval(function () {
+  db.query('SELECT 1');
+}, 5000);
 
 
-var connection;
+/* var connection;
 
 function handleDisconnect() {
   connection = mysql.createConnection(db); // Recreate the connection, since
@@ -50,7 +53,7 @@ function handleDisconnect() {
   });
 }
 
-handleDisconnect();
+handleDisconnect(); */
 
 
 app.use((req, res, next) => {
