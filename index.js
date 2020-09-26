@@ -10,8 +10,6 @@ const jwt = require("jsonwebtoken");
 const mysql = require("mysql");
 const bodyParser = require("body-parser");
 
-app.use(bodyParser.json());
-
 const port = 3000;
 
 //Criar a conecção
@@ -405,7 +403,9 @@ app.listen(process.env.PORT || 5000, function () {
   });
 
   app.get('/', function(req, res) {
-    res.render('index.html');
+    res.sendFile('index.html', {
+      root: __dirname
+    })
 });
   
 });
