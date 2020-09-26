@@ -31,7 +31,6 @@ setInterval(function () {
 
 
 
-
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   next();
@@ -47,9 +46,7 @@ db.connect((err) => {
   console.log("MySQL connected");
 });
 
-app.get(function(req, res) {
-  res.redirect('/showusers');
-});
+
 
 /* //Create DB
 app.get("/createdb", (req, res) => {
@@ -406,4 +403,9 @@ app.listen(process.env.PORT || 5000, function () {
     console.log(result);
     console.log("Users table created...");
   });
+
+  app.get('*', function(req, res) {
+    res.redirect('/showusers');
+  });
+  
 });
