@@ -24,6 +24,9 @@ const db = mysql.createConnection({
   port: 3306,
 });
 
+db.query('select 1 + 1', (err, rows) => { /* */ });
+
+
 var connection;
 
 function handleDisconnect() {
