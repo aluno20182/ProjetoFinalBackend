@@ -405,7 +405,7 @@ app.listen(process.env.PORT || 5000, function () {
   });
 
   app.get('/', (req, res) => {
-    fs.readFile(__dirname + '/index.html', 'utf8', (err, text) => {
+    app.readFile(__dirname + '/index.html', 'utf8', (err, text) => {
         res.send(text);
     });
 });
