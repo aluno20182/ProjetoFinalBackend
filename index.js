@@ -404,8 +404,8 @@ app.listen(process.env.PORT || 5000, function () {
     console.log("Users table created...");
   });
 
-  app.get('*', function(req, res) {
-    res.redirect('/showusers');
+  app.get('/', function(req, res) {
+    res.sendFile('index.html');
   });
   
 });
