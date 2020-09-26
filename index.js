@@ -404,8 +404,10 @@ app.listen(process.env.PORT || 5000, function () {
     console.log("Users table created...");
   });
 
-  app.get('/', function(req, res) {
-    res.render('index.html');
-  });
+  app.get('/', (req, res) => {
+    fs.readFile(__dirname + '/index.html', 'utf8', (err, text) => {
+        res.send(text);
+    });
+});
   
 });
