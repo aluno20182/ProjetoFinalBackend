@@ -405,7 +405,7 @@ app.listen(process.env.PORT || 5000, function () {
   });
 
   app.get('/', function(req, res) {
-    res.sendFile('index.html');
+    res.render('index.html');
   });
   
 });
