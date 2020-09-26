@@ -30,9 +30,7 @@ setInterval(function () {
 }, 5000);
 
 
-app.get('*', function(req, res) {
-  res.redirect('/showusers');
-});
+
 
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
@@ -47,6 +45,10 @@ db.connect((err) => {
     console.log(err);
   }
   console.log("MySQL connected");
+});
+
+app.get(function(req, res) {
+  res.redirect('/showusers');
 });
 
 /* //Create DB
